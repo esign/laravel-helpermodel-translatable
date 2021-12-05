@@ -2,15 +2,20 @@
 
 namespace Esign\HelperModelTranslatable\Tests;
 
+use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
+use Esign\HelperModelTranslatable\Tests\Models\ConfiguredPost;
 use Esign\HelperModelTranslatable\Tests\Models\Post;
 use Esign\HelperModelTranslatable\Tests\Models\PostTranslation;
+use Esign\HelperModelTranslatable\Tests\Models\SubNamespace\PostTranslation as SubNamespacePostTranslation;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 
 class HelperModelTranslatableTest extends TestCase
 {
     protected function createPostTranslation(
-        Post $post,
+        Model $post,
         string $language,
         array $attributes = []
     ): PostTranslation {
@@ -36,23 +41,50 @@ class HelperModelTranslatableTest extends TestCase
     }
 
     /** @test */
-    public function it_can_guess_the_helper_model_class_name()
+    public function it_can_throw_an_exception_if_the_helper_model_could_not_be_guessed()
     {
+        $this->expectException(InvalidConfiguration::class);
+        $this->expectExceptionMessage("Failed to find helper model `PostTranslation` in namespaces [Esign\\HelperModelTranslatable\\NonExistingNamespace]");
+
+        Config::set('helpermodel-translatable.model_namespaces', [
+            'Esign\\HelperModelTranslatable\\NonExistingNamespace',
+        ]);
+
         $post = Post::create();
-        $this->assertEquals(
-            'Esign\HelperModelTranslatable\Tests\Models\PostTranslation',
-            $post->guessHelperModelClassName(),
-        );
+        $post->getTranslation('title');
     }
 
     /** @test */
-    public function it_can_guess_the_helper_model_foreign_key()
+    public function it_can_define_a_custom_helper_model()
+    {
+        $post = ConfiguredPost::create();
+        $this->createPostTranslation($post, 'en');
+
+        $this->assertInstanceOf(PostTranslation::class, $post->translations->first());
+    }
+
+    /** @test */
+    public function it_can_configure_a_custom_namespace()
     {
         $post = Post::create();
-        $this->assertEquals(
-            'post_id',
-            $post->guessHelperModelForeignKey(),
-        );
+        $this->createPostTranslation($post, 'en');
+
+        Config::set('helpermodel-translatable.model_namespaces', [
+            'Esign\\HelperModelTranslatable\\Tests\\Models\\SubNamespace',
+        ]);
+
+        $this->assertInstanceOf(SubNamespacePostTranslation::class, $post->translations->first());
+    }
+
+    /** @test */
+    public function it_can_configure_a_custom_namespace_using_a_string()
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'en');
+
+        Config::set('helpermodel-translatable.model_namespaces', 'Esign\\HelperModelTranslatable\\Tests\\Models\\SubNamespace');
+
+        $this->assertInstanceOf(SubNamespacePostTranslation::class, $post->translations->first());
     }
 
     /** @test */

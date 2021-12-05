@@ -2,9 +2,11 @@
 
 namespace Esign\HelperModelTranslatable\Tests;
 
+use Esign\HelperModelTranslatable\HelperModelTranslatableServiceProvider;
 use Esign\HelperModelTranslatable\Tests\Models\Post;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -16,6 +18,14 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->setUpRoutes();
+        Config::set('helpermodel-translatable.model_namespaces', [
+            'Esign\\HelperModelTranslatable\\Tests\\Models',
+        ]);
+    }
+
+    protected function getPackageProviders($app): array
+    {
+        return [HelperModelTranslatableServiceProvider::class];
     }
 
     protected function getEnvironmentSetUp($app)

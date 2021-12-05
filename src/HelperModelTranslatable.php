@@ -2,12 +2,12 @@
 
 namespace Esign\HelperModelTranslatable;
 
+use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Str;
 
 trait HelperModelTranslatable
 {
@@ -49,8 +49,8 @@ trait HelperModelTranslatable
     public function translations(): HasMany
     {
         return $this->hasMany(
-            $this->guessHelperModelClassName(),
-            $this->guessHelperModelForeignKey()
+            $this->getHelperModelClass(),
+            $this->getHelperModelForeignKey()
         );
     }
 
@@ -63,14 +63,38 @@ trait HelperModelTranslatable
         return parent::getAttribute($key);
     }
 
-    public function guessHelperModelClassName(): string
+    protected function getHelperModelClass(): string
     {
-        return get_class($this) . 'Translation';
+        return $this->guessFullyQualifiedHelperModelClass();
     }
 
-    public function guessHelperModelForeignKey(): string
+    protected function getHelperModelForeignKey(): string
     {
-        return Str::snake(class_basename($this)) . '_id';
+        return $this->guessHelperModelForeignKey();
+    }
+
+    protected function guessFullyQualifiedHelperModelClass(): string
+    {
+        $namespacesToTry = config('helpermodel-translatable.model_namespaces');
+        $helperModelClass = $this->guessHelperModelClass();
+
+        foreach ((array) $namespacesToTry as $namespace) {
+            if (class_exists($className = $namespace . '\\' . $helperModelClass)) {
+                return $className;
+            }
+        }
+
+        throw InvalidConfiguration::helperModelNotFound($helperModelClass, $namespacesToTry);
+    }
+
+    protected function guessHelperModelClass(): string
+    {
+        return class_basename($this) . 'Translation';
+    }
+
+    protected function guessHelperModelForeignKey(): string
+    {
+        return $this->getForeignKey();
     }
 
     public function resolveRouteBinding($value, $field = null): ?Model
