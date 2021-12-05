@@ -9,11 +9,14 @@ use Esign\HelperModelTranslatable\Tests\Models\PostTranslation;
 use Esign\HelperModelTranslatable\Tests\Models\SubNamespace\PostTranslation as SubNamespacePostTranslation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 
 class HelperModelTranslatableTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function createPostTranslation(
         Model $post,
         string $language,

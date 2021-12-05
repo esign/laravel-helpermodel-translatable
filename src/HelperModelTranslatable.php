@@ -6,13 +6,10 @@ use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 
 trait HelperModelTranslatable
 {
-    use RefreshDatabase;
-
     public function isTranslatableAttribute(string $key): bool
     {
         return in_array($key, $this->getTranslatableAttributes());
