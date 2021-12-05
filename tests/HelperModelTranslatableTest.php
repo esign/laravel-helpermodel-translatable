@@ -202,4 +202,28 @@ class HelperModelTranslatableTest extends TestCase
         App::setLocale('en');
         $this->get('/post-en')->assertSee('Post en');
     }
+
+    /** @test */
+    public function it_can_use_another_relationship()
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'en', ['title' => 'Post en']);
+
+        $this->assertEquals(
+            'Post en',
+            $post->useHelperModelRelation('secondaryTranslations')->getTranslation('title', 'en')
+        );
+    }
+
+    /** @test */
+    public function it_can_use_the_default_relationship()
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'en', ['title' => 'Post en']);
+
+        $this->assertEquals(
+            'Post en',
+            $post->useDefaultHelperModelRelation()->getTranslation('title', 'en')
+        );
+    }
 }

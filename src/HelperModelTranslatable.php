@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\App;
 
 trait HelperModelTranslatable
 {
+    protected $helperModelRelation = 'translations';
+
     public function isTranslatableAttribute(string $key): bool
     {
         return in_array($key, $this->getTranslatableAttributes());
@@ -22,7 +24,7 @@ trait HelperModelTranslatable
 
     public function getTranslation(string $key, ?string $locale = null, bool $useFallbackLocale = false): mixed
     {
-        $translation = $this->translations->firstWhere('language', $locale ?? App::getLocale());
+        $translation = $this->{$this->helperModelRelation}->firstWhere('language', $locale ?? App::getLocale());
 
         $value = $translation?->{$key};
 
@@ -41,6 +43,18 @@ trait HelperModelTranslatable
     public function getTranslationWithoutFallback(string $key, ?string $locale): mixed
     {
         return $this->getTranslation($key, $locale, false);
+    }
+
+    public function useHelperModelRelation(string $relation): self
+    {
+        $this->helperModelRelation = $relation;
+
+        return $this;
+    }
+
+    public function useDefaultHelperModelRelation(): self
+    {
+        return $this->useHelperModelRelation('translations');
     }
 
     public function translations(): HasMany
@@ -99,7 +113,7 @@ trait HelperModelTranslatable
         $field ??= $this->getRouteKeyName();
 
         if ($this->isTranslatableAttribute($field)) {
-            return $this->whereHas('translations', function (Builder $query) use ($field, $value) {
+            return $this->whereHas($this->helperModelRelation, function (Builder $query) use ($field, $value) {
                 $query->where($field, $value);
             })->first();
         }
