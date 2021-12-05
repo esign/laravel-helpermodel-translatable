@@ -73,6 +73,21 @@ To retrieve a translation in a specific locale you may use the fully suffixed at
 $post->getTranslation('title', 'nl')
 ```
 
+To check if a translation exists, you may use the `hasTranslation` method:
+```php
+PostTranslation::create(['language' => 'en', 'title' => 'Test en']);
+PostTranslation::create(['language' => 'nl', 'title' => null]);
+PostTranslation::create(['language' => 'fr', 'title' => '']);
+
+$post->hasTranslation('title', 'en'); // returns true
+$post->hasTranslation('title', 'nl'); // returns false
+$post->hasTranslation('title', 'fr'); // returns false
+```
+
+In case you do not supply a locale, the current locale will be used.
+
+
+
 ### Using a fallback
 This package allows you to return the value of an attribute's `fallback_locale` defined in the `config/app.php` of your application.
 

@@ -35,6 +35,11 @@ trait HelperModelTranslatable
         return $value;
     }
 
+    public function hasTranslation(string $key, ?string $locale = null): bool
+    {
+        return ! empty($this->getTranslationWithoutFallback($key, $locale));
+    }
+
     public function getTranslationWithFallback(string $key, ?string $locale): mixed
     {
         return $this->getTranslation($key, $locale, true);
