@@ -25,7 +25,7 @@ trait HelperModelTranslatable
 
     public function getTranslation(string $key, ?string $locale = null, bool $useFallbackLocale = false): mixed
     {
-        $translation =  $this->translations->firstWhere('language', $locale ?? App::getLocale());
+        $translation = $this->translations->firstWhere('language', $locale ?? App::getLocale());
 
         $value = $translation?->{$key};
 
