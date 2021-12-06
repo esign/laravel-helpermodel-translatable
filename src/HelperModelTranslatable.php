@@ -119,7 +119,7 @@ trait HelperModelTranslatable
 
         if ($this->isTranslatableAttribute($field)) {
             return $this->whereHas($this->helperModelRelation, function (Builder $query) use ($field, $value) {
-                $query->where($field, $value);
+                $query->where('language', App::getLocale())->where($field, $value);
             })->first();
         }
 
