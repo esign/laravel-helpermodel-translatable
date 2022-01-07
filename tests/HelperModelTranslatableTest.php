@@ -65,6 +65,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->createPostTranslation($post, 'nl', ['title' => null]);
         $this->createPostTranslation($post, 'fr', ['title' => '']);
 
+        $this->assertTrue($post->hasTranslation('title'));
         $this->assertTrue($post->hasTranslation('title', 'en'));
         $this->assertFalse($post->hasTranslation('title', 'nl'));
         $this->assertFalse($post->hasTranslation('title', 'fr'));
@@ -124,6 +125,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->createPostTranslation($post, 'en', ['title' => 'Test en']);
         $this->createPostTranslation($post, 'nl', ['title' => 'Test nl']);
 
+        $this->assertEquals('Test en', $post->getTranslation('title'));
         $this->assertEquals('Test nl', $post->getTranslation('title', 'nl'));
         $this->assertEquals('Test en', $post->getTranslation('title', 'en'));
     }
@@ -159,6 +161,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->createPostTranslation($post, 'en', ['title' => 'Test en']);
         $this->createPostTranslation($post, 'nl', ['title' => 'Test nl']);
 
+        $this->assertEquals('Test en', $post->getTranslationWithFallback('title'));
         $this->assertEquals('Test nl', $post->getTranslationWithFallback('title', 'nl'));
         $this->assertEquals('Test en', $post->getTranslationWithFallback('title', 'en'));
         $this->assertEquals('Test en', $post->getTranslationWithFallback('title', 'fr'));
@@ -171,6 +174,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->createPostTranslation($post, 'en', ['title' => 'Test en']);
         $this->createPostTranslation($post, 'nl', ['title' => 'Test nl']);
 
+        $this->assertEquals('Test en', $post->getTranslationWithoutFallback('title'));
         $this->assertEquals('Test nl', $post->getTranslationWithoutFallback('title', 'nl'));
         $this->assertEquals('Test en', $post->getTranslationWithoutFallback('title', 'en'));
         $this->assertNull($post->getTranslationWithoutFallback('title', 'fr'));
