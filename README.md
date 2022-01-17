@@ -175,6 +175,17 @@ It's also possible to use a different relationship dynamically by using the `use
 $post->useHelperModelRelation('secondaryTranslations')->getTranslation('title');
 ```
 
+### Scopes
+This package also ships with a few scopes that allow you to set constraints for the translations relationship:
+```php
+Post::whereTranslation('title', 'Post about dogs');
+Post::whereTranslation('title', 'like', '%dogs%');
+Post::whereTranslation('title', 'like', '%dogs%')->orWhereTranslation('title', 'like', '%cats%');
+
+Post::translatedIn('nl');
+Post::translatedIn(['nl', 'en']);
+```
+
 ### Testing
 
 ```bash
