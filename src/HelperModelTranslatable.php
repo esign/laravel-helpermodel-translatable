@@ -2,10 +2,12 @@
 
 namespace Esign\HelperModelTranslatable;
 
+use Closure;
 use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\App;
 
 trait HelperModelTranslatable
@@ -113,14 +115,48 @@ trait HelperModelTranslatable
         return $this->getForeignKey();
     }
 
+    public function scopeWhereTranslation(
+        Builder $query,
+        Closure | string | array | Expression $column,
+        mixed $operator = null,
+        mixed $value = null
+    ): Builder {
+        return $query->whereHas($this->helperModelRelation, function (Builder $query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    public function scopeOrWhereTranslation(
+        Builder $query,
+        Closure | string | array | Expression $column,
+        mixed $operator = null,
+        mixed $value = null
+    ): Builder {
+        return $query->orWhereHas($this->helperModelRelation, function (Builder $query) use ($column, $operator, $value) {
+            $query->where($column, $operator, $value);
+        });
+    }
+
+    public function scopeTranslatedIn(Builder $query, string | array $locale): Builder
+    {
+        return $this->scopeWhereTranslation($query, function (Builder $query) use ($locale) {
+            $query->when(
+                is_array($locale),
+                fn (Builder $query) => $query->whereIn('language', $locale),
+                fn (Builder $query) => $query->where('language', $locale),
+            );
+        });
+    }
+
     public function resolveRouteBinding($value, $field = null): ?Model
     {
         $field ??= $this->getRouteKeyName();
 
         if ($this->isTranslatableAttribute($field)) {
-            return $this->whereHas($this->helperModelRelation, function (Builder $query) use ($field, $value) {
-                $query->where('language', App::getLocale())->where($field, $value);
-            })->first();
+            return $this
+                ->whereTranslation($field, $value)
+                ->translatedIn(App::getLocale())
+                ->first();
         }
 
         return parent::resolveRouteBinding($value, $field);

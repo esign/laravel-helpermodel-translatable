@@ -258,4 +258,73 @@ class HelperModelTranslatableTest extends TestCase
             $post->useDefaultHelperModelRelation()->getTranslation('title', 'en')
         );
     }
+
+    /** @test */
+    public function it_can_use_the_where_translation_scope()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post en']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post nl']);
+
+        $posts = Post::whereTranslation('title', '=', 'Post en')->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertFalse($posts->contains($postB));
+    }
+
+    /** @test */
+    public function it_can_use_the_where_translation_scope_while_mixing_the_operator_and_value()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post en']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post nl']);
+
+        $posts = Post::whereTranslation('title', 'Post en')->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertFalse($posts->contains($postB));
+    }
+
+    /** @test */
+    public function it_can_use_the_or_where_translation_scope()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post en']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post nl']);
+
+        $posts = Post::whereTranslation('title', '=', 'Post en')->orWhereTranslation('title', '=', 'Post nl')->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertTrue($posts->contains($postB));
+    }
+
+    /** @test */
+    public function it_can_use_the_translated_in_scope_using_a_string()
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl']);
+
+        $postsNl = Post::translatedIn('nl')->get();
+        $postsFr = Post::translatedIn('fr')->get();
+
+        $this->assertTrue($postsNl->contains($post));
+        $this->assertFalse($postsFr->contains($post));
+    }
+
+    /** @test */
+    public function it_can_use_the_translated_in_scope_using_an_array()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'nl', ['title' => 'Post nl']);
+        $this->createPostTranslation($postB, 'en', ['title' => 'Post en']);
+
+        $posts = Post::translatedIn(['nl', 'fr'])->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertFalse($posts->contains($postB));
+    }
 }
