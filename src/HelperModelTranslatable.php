@@ -148,6 +148,17 @@ trait HelperModelTranslatable
         });
     }
 
+    public function scopeOrTranslatedIn(Builder $query, string | array $locale): Builder
+    {
+        return $this->scopeOrWhereTranslation($query, function (Builder $query) use ($locale) {
+            $query->when(
+                is_array($locale),
+                fn (Builder $query) => $query->whereIn('language', $locale),
+                fn (Builder $query) => $query->where('language', $locale),
+            );
+        });
+    }
+
     public function resolveRouteBinding($value, $field = null): ?Model
     {
         $field ??= $this->getRouteKeyName();

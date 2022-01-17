@@ -184,6 +184,7 @@ Post::whereTranslation('title', 'like', '%dogs%')->orWhereTranslation('title', '
 
 Post::translatedIn('nl');
 Post::translatedIn(['nl', 'en']);
+Post::translatedIn('nl')->orTranslatedIn('en');
 ```
 
 ### Testing

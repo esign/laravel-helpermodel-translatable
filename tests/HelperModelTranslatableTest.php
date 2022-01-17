@@ -327,4 +327,18 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertTrue($posts->contains($postA));
         $this->assertFalse($posts->contains($postB));
     }
+
+    /** @test */
+    public function it_can_use_the_or_translated_in_scope()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post en']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post nl']);
+
+        $posts = Post::translatedIn('nl')->orTranslatedIn('en')->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertTrue($posts->contains($postB));
+    }
 }
