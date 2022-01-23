@@ -131,6 +131,18 @@ class HelperModelTranslatableTest extends TestCase
     }
 
     /** @test */
+    public function it_can_get_the_translation_model()
+    {
+        $post = Post::create();
+        $postTranslationEn = $this->createPostTranslation($post, 'en', ['title' => 'Test en']);
+        $postTranslationNl = $this->createPostTranslation($post, 'nl', ['title' => 'Test nl']);
+
+        $this->assertTrue($post->getTranslationModel()->is($postTranslationEn));
+        $this->assertTrue($post->getTranslationModel('nl')->is($postTranslationNl));
+        $this->assertNull($post->getTranslationModel('fr'));
+    }
+
+    /** @test */
     public function it_can_get_a_translation_using_a_fallback()
     {
         $post = Post::create();
