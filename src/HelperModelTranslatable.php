@@ -29,6 +29,11 @@ trait HelperModelTranslatable
         return $this->{$this->helperModelRelation}->firstWhere('language', $locale ?? App::getLocale());
     }
 
+    public function getFallbackLocale(?string $locale = null): ?string
+    {
+        return config('app.fallback_locale');
+    }
+
     public function getTranslation(string $key, ?string $locale = null, bool $useFallbackLocale = false): mixed
     {
         $translation = $this->getTranslationModel($locale);
@@ -36,7 +41,7 @@ trait HelperModelTranslatable
         $value = $translation?->{$key};
 
         if (empty($value) && $useFallbackLocale) {
-            $value = $this->getTranslation($key, config('app.fallback_locale', $locale), false);
+            $value = $this->getTranslation($key, $this->getFallbackLocale($locale), false);
         }
 
         return $value;

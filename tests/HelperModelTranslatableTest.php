@@ -6,6 +6,7 @@ use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
 use Esign\HelperModelTranslatable\Tests\Models\ConfiguredPost;
 use Esign\HelperModelTranslatable\Tests\Models\Post;
 use Esign\HelperModelTranslatable\Tests\Models\PostTranslation;
+use Esign\HelperModelTranslatable\Tests\Models\PostWithFallback;
 use Esign\HelperModelTranslatable\Tests\Models\SubNamespace\PostTranslation as SubNamespacePostTranslation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -190,6 +191,19 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertEquals('Test nl', $post->getTranslationWithoutFallback('title', 'nl'));
         $this->assertEquals('Test en', $post->getTranslationWithoutFallback('title', 'en'));
         $this->assertNull($post->getTranslationWithoutFallback('title', 'fr'));
+    }
+
+    /** @test */
+    public function it_can_get_a_translation_with_a_configured_fallback()
+    {
+        $post = PostWithFallback::create();
+        $this->createPostTranslation($post, 'en', ['title' => 'Test en']);
+        $this->createPostTranslation($post, 'fr', ['title' => 'Test fr']);
+
+        $this->assertEquals('Test en', $post->getTranslationWithFallback('title'));
+        $this->assertEquals('Test en', $post->getTranslationWithFallback('title', 'en'));
+        $this->assertEquals('Test fr', $post->getTranslationWithFallback('title', 'nl'));
+        $this->assertEquals('Test fr', $post->getTranslationWithFallback('title', 'fr'));
     }
 
     /** @test */

@@ -113,6 +113,23 @@ $post->getTranslationWithFallback('title', 'nl'); // returns 'Your first transla
 $post->getTranslationWithoutFallback('title', 'nl'); // returns null
 ```
 
+You may configure the fallback locale by overwriting the `getFallbackLocale` method from the `HelperModelTranslatable` trait. The locale that was requested initially is passed as a parameter:
+```php
+use Esign\HelperModelTranslatable\HelperModelTranslatable;
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    use HelperModelTranslatable;
+
+    public $translatable = ['title'];
+
+    public function getFallbackLocale(?string $locale = null): ?string
+    {
+        return 'fr';
+    }
+}
+```
 
 ### Customizing the relationship
 By convention, this package assumes your helper model follows the same name of your main model suffixed by `Translation`, e.g. `Post` and `PostTranslation`.
