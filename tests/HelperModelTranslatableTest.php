@@ -65,11 +65,15 @@ class HelperModelTranslatableTest extends TestCase
         $this->createPostTranslation($post, 'en', ['title' => 'Test en']);
         $this->createPostTranslation($post, 'nl', ['title' => null]);
         $this->createPostTranslation($post, 'fr', ['title' => '']);
+        $this->createPostTranslation($post, 'de', ['tags' => ['🍎', '🍐', '🍋']]);
+        $this->createPostTranslation($post, 'es', ['tags' => []]);
 
         $this->assertTrue($post->hasTranslation('title'));
         $this->assertTrue($post->hasTranslation('title', 'en'));
         $this->assertFalse($post->hasTranslation('title', 'nl'));
         $this->assertFalse($post->hasTranslation('title', 'fr'));
+        $this->assertTrue($post->hasTranslation('tags', 'de'));
+        $this->assertFalse($post->hasTranslation('tags', 'es'));
     }
 
     /** @test */

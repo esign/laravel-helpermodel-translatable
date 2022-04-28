@@ -41,6 +41,7 @@ abstract class TestCase extends BaseTestCase
             $table->string('title')->nullable();
             $table->string('slug')->nullable();
             $table->string('field_with_accessor')->nullable();
+            $table->json('tags')->nullable();
         });
     }
 

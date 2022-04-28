@@ -40,7 +40,7 @@ trait HelperModelTranslatable
 
         $value = $translation?->{$key};
 
-        if (empty($value) && $useFallbackLocale) {
+        if (blank($value) && $useFallbackLocale) {
             $value = $this->getTranslation($key, $this->getFallbackLocale($locale), false);
         }
 
@@ -49,7 +49,7 @@ trait HelperModelTranslatable
 
     public function hasTranslation(string $key, ?string $locale = null): bool
     {
-        return ! empty($this->getTranslationWithoutFallback($key, $locale));
+        return ! blank($this->getTranslationWithoutFallback($key, $locale));
     }
 
     public function getTranslationWithFallback(string $key, ?string $locale = null): mixed

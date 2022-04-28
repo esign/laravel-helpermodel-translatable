@@ -78,10 +78,14 @@ To check if a translation exists, you may use the `hasTranslation` method:
 PostTranslation::create(['language' => 'en', 'title' => 'Test en']);
 PostTranslation::create(['language' => 'nl', 'title' => null]);
 PostTranslation::create(['language' => 'fr', 'title' => '']);
+PostTranslation::create(['language' => 'de', 'tags' => ['🍎', '🍐', '🍋']]);
+PostTranslation::create(['language' => 'es', 'tags' => []]);
 
 $post->hasTranslation('title', 'en'); // returns true
 $post->hasTranslation('title', 'nl'); // returns false
 $post->hasTranslation('title', 'fr'); // returns false
+$post->hasTranslation('title', 'de'); // returns true
+$post->hasTranslation('title', 'es'); // returns false
 ```
 
 To retrieve the actual translation model you may use the `getTranslationModel` method:
