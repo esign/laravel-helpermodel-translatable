@@ -73,19 +73,25 @@ To retrieve a translation in a specific locale you may use the fully suffixed at
 $post->getTranslation('title', 'nl')
 ```
 
-To check if a translation exists, you may use the `hasTranslation` method:
+To check if a translated attribute exists, you may use the `hasTranslation` method:
 ```php
-PostTranslation::create(['language' => 'en', 'title' => 'Test en']);
-PostTranslation::create(['language' => 'nl', 'title' => null]);
+PostTranslation::create(['language' => 'en', 'title' => 'Test en', 'tags' => ['🍎', '🍐', '🍋']]);
+PostTranslation::create(['language' => 'nl', 'title' => null, 'tags' => []]);
 PostTranslation::create(['language' => 'fr', 'title' => '']);
-PostTranslation::create(['language' => 'de', 'tags' => ['🍎', '🍐', '🍋']]);
-PostTranslation::create(['language' => 'es', 'tags' => []]);
 
 $post->hasTranslation('title', 'en'); // returns true
 $post->hasTranslation('title', 'nl'); // returns false
 $post->hasTranslation('title', 'fr'); // returns false
-$post->hasTranslation('title', 'de'); // returns true
-$post->hasTranslation('title', 'es'); // returns false
+$post->hasTranslation('tags', 'en'); // returns true
+$post->hasTranslation('tags', 'nl'); // returns false
+```
+
+In case you need to check if the actual translation model exists, you may use the `hasTranslationModel` method:
+```php
+PostTranslation::create(['language' => 'en']);
+
+$post->hasTranslationModel('en'); // returns true
+$post->hasTranslationModel('nl'); // returns false
 ```
 
 To retrieve the actual translation model you may use the `getTranslationModel` method:

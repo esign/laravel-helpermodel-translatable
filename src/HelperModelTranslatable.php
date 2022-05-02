@@ -29,6 +29,11 @@ trait HelperModelTranslatable
         return $this->{$this->helperModelRelation}->firstWhere('language', $locale ?? App::getLocale());
     }
 
+    public function hasTranslationModel(?string $locale = null): bool
+    {
+        return (bool) $this->getTranslationModel($locale);
+    }
+
     public function getFallbackLocale(?string $locale = null): ?string
     {
         return config('app.fallback_locale');

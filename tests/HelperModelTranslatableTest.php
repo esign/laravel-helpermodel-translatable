@@ -77,6 +77,17 @@ class HelperModelTranslatableTest extends TestCase
     }
 
     /** @test */
+    public function it_can_check_if_it_has_a_translation_model()
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'en');
+
+        $this->assertTrue($post->hasTranslationModel());
+        $this->assertTrue($post->hasTranslationModel('en'));
+        $this->assertFalse($post->hasTranslationModel('nl'));
+    }
+
+    /** @test */
     public function it_can_define_a_custom_helper_model()
     {
         $post = ConfiguredPost::create();
