@@ -193,12 +193,10 @@ trait HelperModelTranslatable
         $field ??= $this->getRouteKeyName();
 
         if ($this->isTranslatableAttribute($field)) {
-            return $this->whereTranslation(
-                column: $field,
-                operator: '=',
-                value: $value,
-                locale: App::getLocale(),
-            )->first();
+            return $this
+                ->whereTranslation($field, $value)
+                ->translatedIn(App::getLocale())
+                ->first();
         }
 
         return parent::resolveRouteBinding($value, $field);
