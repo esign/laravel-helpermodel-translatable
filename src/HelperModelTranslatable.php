@@ -134,10 +134,15 @@ trait HelperModelTranslatable
         Builder $query,
         Closure | string | array | Expression $column,
         mixed $operator = null,
-        mixed $value = null
+        mixed $value = null,
+        string | array | null $locale = null,
     ): Builder {
-        return $query->whereHas($this->helperModelRelation, function (Builder $query) use ($column, $operator, $value) {
+        return $query->whereHas($this->helperModelRelation, function (Builder $query) use ($column, $operator, $value, $locale) {
             $query->where($column, $operator, $value);
+
+            if (! is_null($locale)) {
+                $this->scopeLocale($query, $locale);
+            }
         });
     }
 
@@ -145,33 +150,42 @@ trait HelperModelTranslatable
         Builder $query,
         Closure | string | array | Expression $column,
         mixed $operator = null,
-        mixed $value = null
+        mixed $value = null,
+        string | array | null $locale = null,
     ): Builder {
-        return $query->orWhereHas($this->helperModelRelation, function (Builder $query) use ($column, $operator, $value) {
+        return $query->orWhereHas($this->helperModelRelation, function (Builder $query) use ($column, $operator, $value, $locale) {
             $query->where($column, $operator, $value);
+
+            if (! is_null($locale)) {
+                $this->scopeLocale($query, $locale);
+            }
         });
     }
 
     public function scopeTranslatedIn(Builder $query, string | array $locale): Builder
     {
         return $this->scopeWhereTranslation($query, function (Builder $query) use ($locale) {
-            $query->when(
-                is_array($locale),
-                fn (Builder $query) => $query->whereIn('language', $locale),
-                fn (Builder $query) => $query->where('language', $locale),
-            );
+            return $this->scopeLocale($query, $locale);
         });
     }
 
     public function scopeOrTranslatedIn(Builder $query, string | array $locale): Builder
     {
         return $this->scopeOrWhereTranslation($query, function (Builder $query) use ($locale) {
-            $query->when(
-                is_array($locale),
-                fn (Builder $query) => $query->whereIn('language', $locale),
-                fn (Builder $query) => $query->where('language', $locale),
-            );
+            return $this->scopeLocale($query, $locale);
         });
+    }
+
+    /**
+     * This scope is for internal use only, hence why it's private.
+     */
+    private function scopeLocale(Builder $query, string | array $locale): Builder
+    {
+        return $query->when(
+            is_array($locale),
+            fn (Builder $query) => $query->whereIn('language', $locale),
+            fn (Builder $query) => $query->where('language', $locale),
+        );
     }
 
     public function resolveRouteBinding($value, $field = null): ?Model
@@ -179,10 +193,12 @@ trait HelperModelTranslatable
         $field ??= $this->getRouteKeyName();
 
         if ($this->isTranslatableAttribute($field)) {
-            return $this
-                ->whereTranslation($field, $value)
-                ->translatedIn(App::getLocale())
-                ->first();
+            return $this->whereTranslation(
+                column: $field,
+                operator: '=',
+                value: $value,
+                locale: App::getLocale(),
+            )->first();
         }
 
         return parent::resolveRouteBinding($value, $field);

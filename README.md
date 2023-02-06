@@ -211,6 +211,8 @@ This package also ships with a few scopes that allow you to set constraints for 
 ```php
 Post::whereTranslation('title', 'Post about dogs');
 Post::whereTranslation('title', 'like', '%dogs%');
+Post::whereTranslation('title', 'like', '%dogs%', 'nl');
+Post::whereTranslation('title', 'like', '%dogs%', ['nl', 'en']);
 Post::whereTranslation('title', 'like', '%dogs%')->orWhereTranslation('title', 'like', '%cats%');
 
 Post::translatedIn('nl');

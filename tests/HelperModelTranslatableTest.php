@@ -2,6 +2,7 @@
 
 namespace Esign\HelperModelTranslatable\Tests;
 
+use BadMethodCallException;
 use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
 use Esign\HelperModelTranslatable\Tests\Models\ConfiguredPost;
 use Esign\HelperModelTranslatable\Tests\Models\Post;
@@ -343,6 +344,48 @@ class HelperModelTranslatableTest extends TestCase
     }
 
     /** @test */
+    public function it_can_use_the_where_translation_scope_without_a_given_locale()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post']);
+
+        $posts = Post::whereTranslation('title', '=', 'Post')->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertTrue($posts->contains($postB));
+    }
+
+    /** @test */
+    public function it_can_use_the_where_translation_scope_using_a_string_as_a_locale()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post']);
+
+        $posts = Post::whereTranslation('title', '=', 'Post', 'en')->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertFalse($posts->contains($postB));
+    }
+
+    /** @test */
+    public function it_can_use_the_where_translation_scope_using_an_array_as_a_locale()
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post']);
+
+        $posts = Post::whereTranslation('title', '=', 'Post', ['en'])->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertFalse($posts->contains($postB));
+    }
+
+    /** @test */
     public function it_can_use_the_translated_in_scope_using_a_string()
     {
         $post = Post::create();
@@ -367,6 +410,15 @@ class HelperModelTranslatableTest extends TestCase
 
         $this->assertTrue($posts->contains($postA));
         $this->assertFalse($posts->contains($postB));
+    }
+
+    /** @test */
+    public function it_cannot_use_the_internal_locale_scope()
+    {
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessageMatches('/scopeLocale()/');
+
+        Post::locale('nl')->get();
     }
 
     /** @test */
