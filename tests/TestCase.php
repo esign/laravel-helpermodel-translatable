@@ -18,9 +18,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->setUpRoutes();
-        Config::set('helpermodel-translatable.model_namespaces', [
-            'Esign\\HelperModelTranslatable\\Tests\\Models',
-        ]);
+        $this->setUpDatabase();
     }
 
     protected function getPackageProviders($app): array
@@ -30,10 +28,25 @@ abstract class TestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        Config::set('helpermodel-translatable.model_namespaces', [
+            'Esign\\HelperModelTranslatable\\Tests\\Models',
+        ]);
+    }
+
+    protected function setUpRoutes(): void
+    {
+        Route::get('/{post}', function (Post $post) {
+            return $post->getTranslation('title');
+        })->middleware(SubstituteBindings::class);
+    }
+
+    protected function setUpDatabase(): void
+    {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->string('body')->nullable();
         });
+
         Schema::create('post_translations', function (Blueprint $table) {
             $table->id();
             $table->string('language', 5);
@@ -43,12 +56,5 @@ abstract class TestCase extends BaseTestCase
             $table->string('field_with_accessor')->nullable();
             $table->json('tags')->nullable();
         });
-    }
-
-    protected function setUpRoutes(): void
-    {
-        Route::get('/{post}', function (Post $post) {
-            return $post->getTranslation('title');
-        })->middleware(SubstituteBindings::class);
     }
 }
