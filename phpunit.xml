@@ -5,8 +5,8 @@
   backupGlobals="false"
   colors="true"
   processIsolation="false"
-  stopOnFailure="false" xsi
-  noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+  stopOnFailure="false"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
   cacheDirectory=".phpunit.cache"
   backupStaticProperties="false"
 >
