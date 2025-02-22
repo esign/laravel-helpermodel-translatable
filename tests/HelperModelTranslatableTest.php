@@ -2,6 +2,7 @@
 
 namespace Esign\HelperModelTranslatable\Tests;
 
+use PHPUnit\Framework\Attributes\Test;
 use BadMethodCallException;
 use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
 use Esign\HelperModelTranslatable\Tests\Models\ConfiguredPost;
@@ -30,7 +31,7 @@ class HelperModelTranslatableTest extends TestCase
         ));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_an_attribute_is_translatable()
     {
         $post = Post::create();
@@ -38,14 +39,14 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($post->isTranslatableAttribute('non-translatable-field'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_translatable_attributes()
     {
         $post = Post::create();
         $this->assertContains('title', $post->getTranslatableAttributes());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_throw_an_exception_if_the_helper_model_could_not_be_guessed()
     {
         $this->expectException(InvalidConfiguration::class);
@@ -59,7 +60,7 @@ class HelperModelTranslatableTest extends TestCase
         $post->getTranslation('title');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_it_has_a_translation()
     {
         $post = Post::create();
@@ -77,7 +78,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($post->hasTranslation('tags', 'es'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_check_if_it_has_a_translation_model()
     {
         $post = Post::create();
@@ -88,7 +89,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($post->hasTranslationModel('nl'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_define_a_custom_helper_model()
     {
         $post = ConfiguredPost::create();
@@ -97,7 +98,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertInstanceOf(PostTranslation::class, $post->translations->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_configure_a_custom_namespace()
     {
         $post = Post::create();
@@ -110,7 +111,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertInstanceOf(SubNamespacePostTranslation::class, $post->translations->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_configure_a_custom_namespace_using_a_string()
     {
         $post = Post::create();
@@ -121,21 +122,21 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertInstanceOf(SubNamespacePostTranslation::class, $post->translations->first());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_the_translations_relationship()
     {
         $post = Post::create();
         $this->assertInstanceOf(HasMany::class, $post->translations());
     }
 
-    /** @test */
+    #[Test]
     public function it_wont_interfere_when_getting_non_translatable_attributes()
     {
         $post = Post::create(['body' => 'Test']);
         $this->assertEquals('Test', $post->body);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation()
     {
         $post = Post::create();
@@ -147,7 +148,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertEquals('Test en', $post->getTranslation('title', 'en'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_the_translation_model()
     {
         $post = Post::create();
@@ -159,7 +160,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertNull($post->getTranslationModel('fr'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation_using_a_fallback()
     {
         $post = Post::create();
@@ -171,7 +172,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertEquals('Test en', $post->getTranslation('title', 'fr', true));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation_without_using_a_fallback()
     {
         $post = Post::create();
@@ -183,7 +184,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertNull($post->getTranslation('title', 'fr', false));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation_with_a_fallback()
     {
         $post = Post::create();
@@ -196,7 +197,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertEquals('Test en', $post->getTranslationWithFallback('title', 'fr'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation_without_a_fallback()
     {
         $post = Post::create();
@@ -209,7 +210,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertNull($post->getTranslationWithoutFallback('title', 'fr'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation_with_a_configured_fallback()
     {
         $post = PostWithFallback::create();
@@ -222,7 +223,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertEquals('Test fr', $post->getTranslationWithFallback('title', 'fr'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation_using_a_property()
     {
         $post = Post::create();
@@ -239,7 +240,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertNull($post->title);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_get_a_translation_using_an_accessor()
     {
         $post = Post::create();
@@ -248,7 +249,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertEquals('test en', $post->field_with_accessor);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resolve_route_binding_for_translated_attributes()
     {
         $post = Post::create();
@@ -262,7 +263,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->get('/post-en')->assertSee('Post en');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_resolve_route_binding_for_the_active_language_if_they_have_matching_slugs()
     {
         $postA = Post::create();
@@ -277,7 +278,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->get('/post')->assertSee('Post en');
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_another_relationship()
     {
         $post = Post::create();
@@ -289,7 +290,7 @@ class HelperModelTranslatableTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_default_relationship()
     {
         $post = Post::create();
@@ -301,7 +302,7 @@ class HelperModelTranslatableTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_where_translation_scope()
     {
         $postA = Post::create();
@@ -315,7 +316,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($posts->contains($postB));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_where_translation_scope_while_mixing_the_operator_and_value()
     {
         $postA = Post::create();
@@ -329,7 +330,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($posts->contains($postB));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_or_where_translation_scope()
     {
         $postA = Post::create();
@@ -343,7 +344,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertTrue($posts->contains($postB));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_where_translation_scope_without_a_given_locale()
     {
         $postA = Post::create();
@@ -357,7 +358,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertTrue($posts->contains($postB));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_where_translation_scope_using_a_string_as_a_locale()
     {
         $postA = Post::create();
@@ -371,7 +372,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($posts->contains($postB));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_where_translation_scope_using_an_array_as_a_locale()
     {
         $postA = Post::create();
@@ -385,7 +386,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($posts->contains($postB));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_translated_in_scope_using_a_string()
     {
         $post = Post::create();
@@ -398,7 +399,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($postsFr->contains($post));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_translated_in_scope_using_an_array()
     {
         $postA = Post::create();
@@ -412,7 +413,7 @@ class HelperModelTranslatableTest extends TestCase
         $this->assertFalse($posts->contains($postB));
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_use_the_internal_locale_scope()
     {
         $this->expectException(BadMethodCallException::class);
@@ -421,7 +422,7 @@ class HelperModelTranslatableTest extends TestCase
         Post::locale('nl')->get();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_the_or_translated_in_scope()
     {
         $postA = Post::create();
