@@ -16,7 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 
-class HelperModelTranslatableTest extends TestCase
+final class HelperModelTranslatableTest extends TestCase
 {
     use RefreshDatabase;
 
