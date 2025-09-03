@@ -279,6 +279,20 @@ final class HelperModelTranslatableTest extends TestCase
     }
 
     #[Test]
+    public function it_wont_resolve_route_binding_for_the_active_language_for_the_slug_of_another_language(): void
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl']);
+        $this->createPostTranslation($post, 'en', ['title' => 'Post en', 'slug' => 'post-en']);
+
+        App::setLocale('nl');
+        $this->get('/post-nl')->assertSee('Post nl');
+
+        App::setLocale('en');
+        $this->get('/post-nl')->assertNotFound();
+    }
+
+    #[Test]
     public function it_can_use_another_relationship(): void
     {
         $post = Post::create();

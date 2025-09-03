@@ -194,8 +194,7 @@ trait HelperModelTranslatable
 
         if ($this->isTranslatableAttribute($field)) {
             return $this
-                ->whereTranslation($field, $value)
-                ->translatedIn(App::getLocale())
+                ->whereTranslation($field, '=', $value, App::getLocale())
                 ->first();
         }
 
