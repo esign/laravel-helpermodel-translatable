@@ -163,6 +163,8 @@ final class HelperModelTranslatableTest extends TestCase
     #[Test]
     public function it_can_get_the_translation_model_using_a_fallback(): void
     {
+        Config::set('app.fallback_locale', 'en');
+
         $post = Post::create();
         $postTranslationEn = $this->createPostTranslation($post, 'en', ['title' => 'Test en']);
 
