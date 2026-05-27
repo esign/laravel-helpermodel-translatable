@@ -249,8 +249,11 @@ trait HelperModelTranslatable
 
         if ($this->isTranslatableAttribute($field)) {
             return $this
-                ->whereTranslation($field, '=', $value, App::getLocale())
-                ->orWhereFallbackTranslation($field, '=', $value)
+                ->where(function (Builder $query) use ($field, $value) {
+                    $query
+                        ->whereTranslation($field, '=', $value, App::getLocale())
+                        ->orWhereFallbackTranslation($field, '=', $value);
+                })
                 ->first();
         }
 
