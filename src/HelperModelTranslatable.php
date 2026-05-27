@@ -4,11 +4,14 @@ namespace Esign\HelperModelTranslatable;
 
 use Closure;
 use Esign\HelperModelTranslatable\Exceptions\InvalidConfiguration;
+use Illuminate\Contracts\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 trait HelperModelTranslatable
 {
@@ -24,9 +27,15 @@ trait HelperModelTranslatable
         return $this->translatable ?? [];
     }
 
-    public function getTranslationModel(?string $locale = null): ?Model
+    public function getTranslationModel(?string $locale = null, bool $useFallbackLocale = false): ?Model
     {
-        return $this->{$this->helperModelRelation}->firstWhere('language', $locale ?? App::getLocale());
+        $model = $this->{$this->helperModelRelation}->firstWhere('locale', $locale ?? App::getLocale());
+
+        if (is_null($model) && $useFallbackLocale) {
+            $model = $this->{$this->helperModelRelation}->firstWhere('locale', $this->getFallbackLocale($locale));
+        }
+
+        return $model;
     }
 
     public function hasTranslationModel(?string $locale = null): bool
@@ -36,6 +45,13 @@ trait HelperModelTranslatable
 
     public function getFallbackLocale(?string $locale = null): ?string
     {
+        $locale ??= App::getLocale();
+        $translationModel = $this->getTranslationModel($locale);
+
+        if ($translationModel && ! blank($translationModel->fallback_locale)) {
+            return $translationModel->fallback_locale;
+        }
+
         return config('app.fallback_locale');
     }
 
@@ -183,9 +199,48 @@ trait HelperModelTranslatable
     {
         return $query->when(
             is_array($locale),
-            fn (Builder $query) => $query->whereIn('language', $locale),
-            fn (Builder $query) => $query->where('language', $locale),
+            fn (Builder $query) => $query->whereIn('locale', $locale),
+            fn (Builder $query) => $query->where('locale', $locale),
         );
+    }
+
+    public function scopeWhereFallbackTranslation(
+        Builder $query,
+        Closure | string | array | Expression $column,
+        mixed $operator = null,
+        mixed $value = null,
+        string $boolean = 'and',
+    ): Builder {
+        $helperModelClass = $this->getHelperModelClass();
+        $helperModelForeignKey = $this->getHelperModelForeignKey();
+        /** @var \Illuminate\Database\Eloquent\Model $helperModel */
+        $helperModel = new $helperModelClass;
+        $helperTable = $helperModel->getTable();
+
+        $whereExistsStatement = $boolean === 'and' ? 'whereExists' : 'orWhereExists';
+
+        return $query->{$whereExistsStatement}(function (QueryBuilder $fallbackQuery) use ($helperTable, $helperModelForeignKey, $column, $operator, $value) {
+            $fallbackQuery
+                ->select(DB::raw(1))
+                ->from("{$helperTable} as base")
+                ->join("{$helperTable} as fallback", function (JoinClause $join) use ($helperModelForeignKey) {
+                    $join
+                        ->on('fallback.' . $helperModelForeignKey, '=', 'base.' . $helperModelForeignKey)
+                        ->on('fallback.locale', '=', 'base.fallback_locale');
+                })
+                ->whereColumn('base.' . $helperModelForeignKey, $this->getQualifiedKeyName())
+                ->where('base.locale', App::getLocale())
+                ->where(is_string($column) ? "fallback.$column" : $column, $operator, $value);
+        });
+    }
+
+    public function scopeOrWhereFallbackTranslation(
+        Builder $query,
+        Closure | string | array | Expression $column,
+        mixed $operator = null,
+        mixed $value = null,
+    ): Builder {
+        return $this->scopeWhereFallbackTranslation($query, $column, $operator, $value, 'or');
     }
 
     public function resolveRouteBinding($value, $field = null): ?Model
@@ -194,7 +249,11 @@ trait HelperModelTranslatable
 
         if ($this->isTranslatableAttribute($field)) {
             return $this
-                ->whereTranslation($field, '=', $value, App::getLocale())
+                ->where(function (Builder $query) use ($field, $value) {
+                    $query
+                        ->whereTranslation($field, '=', $value, App::getLocale())
+                        ->orWhereFallbackTranslation($field, '=', $value);
+                })
                 ->first();
         }
 
