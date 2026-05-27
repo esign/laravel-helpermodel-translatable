@@ -75,9 +75,9 @@ $post->getTranslation('title', 'nl')
 
 To check if a translated attribute exists, you may use the `hasTranslation` method:
 ```php
-PostTranslation::create(['language' => 'en', 'title' => 'Test en', 'tags' => ['🍎', '🍐', '🍋']]);
-PostTranslation::create(['language' => 'nl', 'title' => null, 'tags' => []]);
-PostTranslation::create(['language' => 'fr', 'title' => '']);
+PostTranslation::create(['locale' => 'en', 'title' => 'Test en', 'tags' => ['🍎', '🍐', '🍋']]);
+PostTranslation::create(['locale' => 'nl', 'title' => null, 'tags' => []]);
+PostTranslation::create(['locale' => 'fr', 'title' => '']);
 
 $post->hasTranslation('title', 'en'); // returns true
 $post->hasTranslation('title', 'nl'); // returns false
@@ -88,7 +88,7 @@ $post->hasTranslation('tags', 'nl'); // returns false
 
 In case you need to check if the actual translation model exists, you may use the `hasTranslationModel` method:
 ```php
-PostTranslation::create(['language' => 'en']);
+PostTranslation::create(['locale' => 'en']);
 
 $post->hasTranslationModel('en'); // returns true
 $post->hasTranslationModel('nl'); // returns false
@@ -107,8 +107,8 @@ This package allows you to return the value of an attribute's `fallback_locale` 
 
 The third `useFallbackLocale` parameter of the `getTranslation` method may be used to control this behaviour:
 ```php
-PostTranslation::create(['language' => 'en', 'title' => 'Your first translation']);
-PostTranslation::create(['language' => 'nl', 'title' => null]);
+PostTranslation::create(['locale' => 'en', 'title' => 'Your first translation']);
+PostTranslation::create(['locale' => 'nl', 'title' => null]);
 
 $post->getTranslation('title', 'nl', true); // returns 'Your first translation'
 $post->getTranslation('title', 'nl', false); // returns null
@@ -116,8 +116,8 @@ $post->getTranslation('title', 'nl', false); // returns null
 
 Or you may use dedicated methods for this:
 ```php
-PostTranslation::create(['language' => 'en', 'title' => 'Your first translation']);
-PostTranslation::create(['language' => 'nl', 'title' => null]);
+PostTranslation::create(['locale' => 'en', 'title' => 'Your first translation']);
+PostTranslation::create(['locale' => 'nl', 'title' => null]);
 
 $post->getTranslationWithFallback('title', 'nl'); // returns 'Your first translation'
 $post->getTranslationWithoutFallback('title', 'nl'); // returns null

@@ -49,8 +49,8 @@ abstract class TestCase extends BaseTestCase
 
         Schema::create('post_translations', function (Blueprint $table) {
             $table->id();
-            $table->string('language', 5);
-            $table->string('fallback_language', 5)->nullable();
+            $table->string('locale', 5);
+            $table->string('fallback_locale', 5)->nullable();
             $table->foreignId('post_id')->constrained('posts');
             $table->string('title')->nullable();
             $table->string('slug')->nullable();

@@ -29,7 +29,7 @@ trait HelperModelTranslatable
 
     public function getTranslationModel(?string $locale = null): ?Model
     {
-        return $this->{$this->helperModelRelation}->firstWhere('language', $locale ?? App::getLocale());
+        return $this->{$this->helperModelRelation}->firstWhere('locale', $locale ?? App::getLocale());
     }
 
     public function hasTranslationModel(?string $locale = null): bool
@@ -42,8 +42,8 @@ trait HelperModelTranslatable
         $locale ??= App::getLocale();
         $translationModel = $this->getTranslationModel($locale);
 
-        if ($translationModel && ! blank($translationModel->fallback_language)) {
-            return $translationModel->fallback_language;
+        if ($translationModel && ! blank($translationModel->fallback_locale)) {
+            return $translationModel->fallback_locale;
         }
 
         return config('app.fallback_locale');
@@ -193,8 +193,8 @@ trait HelperModelTranslatable
     {
         return $query->when(
             is_array($locale),
-            fn (Builder $query) => $query->whereIn('language', $locale),
-            fn (Builder $query) => $query->where('language', $locale),
+            fn (Builder $query) => $query->whereIn('locale', $locale),
+            fn (Builder $query) => $query->where('locale', $locale),
         );
     }
 
@@ -220,10 +220,10 @@ trait HelperModelTranslatable
                 ->join("{$helperTable} as fallback", function (JoinClause $join) use ($helperModelForeignKey) {
                     $join
                         ->on('fallback.' . $helperModelForeignKey, '=', 'base.' . $helperModelForeignKey)
-                        ->on('fallback.language', '=', 'base.fallback_language');
+                        ->on('fallback.locale', '=', 'base.fallback_locale');
                 })
                 ->whereColumn('base.' . $helperModelForeignKey, $this->qualifyColumn('id'))
-                ->where('base.language', App::getLocale())
+                ->where('base.locale', App::getLocale())
                 ->where(is_string($column) ? "fallback.$column" : $column, $operator, $value);
         });
     }
