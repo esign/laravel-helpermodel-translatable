@@ -449,4 +449,98 @@ final class HelperModelTranslatableTest extends TestCase
         $this->assertTrue($posts->contains($postA));
         $this->assertTrue($posts->contains($postB));
     }
+
+    #[Test]
+    public function it_can_get_the_fallback_locale_from_the_translation_model(): void
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'fallback_language' => 'en']);
+        $this->createPostTranslation($post, 'en', ['title' => 'Post en', 'fallback_language' => 'nl']);
+
+        App::setLocale('nl');
+        $this->assertEquals('en', $post->getFallbackLocale('nl'));
+
+        App::setLocale('en');
+        $this->assertEquals('nl', $post->getFallbackLocale('en'));
+    }
+
+    #[Test]
+    public function it_falls_back_to_app_fallback_locale_when_no_fallback_language_defined(): void
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl']);
+
+        $this->assertEquals(config('app.fallback_locale'), $post->getFallbackLocale('nl'));
+    }
+
+    #[Test]
+    public function it_can_get_a_translation_using_database_defined_fallback(): void
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'fallback_language' => 'fr']);
+        $this->createPostTranslation($post, 'fr', ['title' => 'Post fr']);
+        $this->createPostTranslation($post, 'de', ['title' => null, 'fallback_language' => 'fr']);
+
+        $this->assertEquals('Post nl', $post->getTranslationWithFallback('title', 'nl'));
+        $this->assertEquals('Post fr', $post->getTranslationWithFallback('title', 'de'));
+    }
+
+    #[Test]
+    public function it_can_use_the_where_fallback_translation_scope(): void
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => null, 'slug' => null, 'fallback_language' => 'nl']);
+        $this->createPostTranslation($postA, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl', 'fallback_language' => 'en']);
+        $this->createPostTranslation($postB, 'en', ['title' => 'Other post', 'slug' => 'other-post']);
+
+        App::setLocale('en');
+        $posts = Post::whereFallbackTranslation('title', '=', 'Post nl')->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertFalse($posts->contains($postB));
+    }
+
+    #[Test]
+    public function it_can_use_the_or_where_fallback_translation_scope(): void
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post en']);
+        $this->createPostTranslation($postB, 'en', ['title' => null, 'fallback_language' => 'nl']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post nl', 'fallback_language' => 'en']);
+
+        App::setLocale('en');
+        $posts = Post::whereTranslation('title', '=', 'Post en', 'en')
+            ->orWhereFallbackTranslation('title', '=', 'Post nl')
+            ->get();
+
+        $this->assertTrue($posts->contains($postA));
+        $this->assertTrue($posts->contains($postB));
+    }
+
+    #[Test]
+    public function it_can_resolve_route_binding_with_fallback_translation(): void
+    {
+        $post = Post::create();
+        $this->createPostTranslation($post, 'en', ['title' => 'Post en', 'slug' => null, 'fallback_language' => 'nl']);
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl', 'fallback_language' => 'en']);
+
+        App::setLocale('en');
+        $this->get('/post-nl')->assertSee('Post en');
+    }
+
+    #[Test]
+    public function it_prefers_current_locale_over_fallback_in_route_binding(): void
+    {
+        $postA = Post::create();
+        $postB = Post::create();
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post en', 'slug' => 'post', 'fallback_language' => 'nl']);
+        $this->createPostTranslation($postA, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl', 'fallback_language' => 'en']);
+        $this->createPostTranslation($postB, 'en', ['title' => null, 'slug' => null, 'fallback_language' => 'nl']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post B nl', 'slug' => 'post', 'fallback_language' => 'en']);
+
+        App::setLocale('en');
+        $this->get('/post')->assertSee('Post en');
+    }
 }
