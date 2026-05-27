@@ -103,21 +103,22 @@ $post->getTranslationModel('nl');
 In case you do not supply a locale, the current locale will be used.
 
 ### Using a fallback
-This package allows you to return the value of an attribute's `fallback_locale` defined in the `config/app.php` of your application.
+This package allows you to return the value of an attribute's fallback locale. By default, the `fallback_locale` defined in `config/app.php` is used. However, you can also define fallbacks per-row on your translation tables by adding a `fallback_locale` column:
 
-The third `useFallbackLocale` parameter of the `getTranslation` method may be used to control this behaviour:
 ```php
 PostTranslation::create(['locale' => 'en', 'title' => 'Your first translation']);
-PostTranslation::create(['locale' => 'nl', 'title' => null]);
+PostTranslation::create(['locale' => 'nl', 'title' => null, 'fallback_locale' => 'en']);
 
 $post->getTranslation('title', 'nl', true); // returns 'Your first translation'
 $post->getTranslation('title', 'nl', false); // returns null
 ```
 
+When a `fallback_locale` is defined on the translation model, it takes priority over the application's `fallback_locale` config value.
+
 Or you may use dedicated methods for this:
 ```php
 PostTranslation::create(['locale' => 'en', 'title' => 'Your first translation']);
-PostTranslation::create(['locale' => 'nl', 'title' => null]);
+PostTranslation::create(['locale' => 'nl', 'title' => null, 'fallback_locale' => 'en']);
 
 $post->getTranslationWithFallback('title', 'nl'); // returns 'Your first translation'
 $post->getTranslationWithoutFallback('title', 'nl'); // returns null
@@ -218,6 +219,13 @@ Post::whereTranslation('title', 'like', '%dogs%')->orWhereTranslation('title', '
 Post::translatedIn('nl');
 Post::translatedIn(['nl', 'en']);
 Post::translatedIn('nl')->orTranslatedIn('en');
+```
+
+To query models via their database-defined `fallback_locale`, you may use the fallback translation scopes:
+```php
+Post::whereFallbackTranslation('title', '<>', '');
+Post::whereTranslation('title', '=', $value, App::getLocale())
+    ->orWhereFallbackTranslation('title', '=', $value);
 ```
 
 ### Testing
