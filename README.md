@@ -104,7 +104,7 @@ $post->getTranslationModel('nl', true); // falls back to the fallback locale if 
 In case you do not supply a locale, the current locale will be used.
 
 ### Using a fallback
-This package allows you to return the value of an attribute's fallback locale. By default, the `fallback_locale` defined in `config/app.php` is used. However, you can also define fallbacks per-row on your translation tables by adding a `fallback_locale` column:
+This package allows you to return an attribute's translation value from a fallback locale when the value for the requested locale is blank or missing. By default, the `fallback_locale` defined in `config/app.php` is used. However, you can also define fallbacks per-row on your translation tables by adding a `fallback_locale` column:
 
 ```php
 PostTranslation::create(['locale' => 'en', 'title' => 'Your first translation']);
