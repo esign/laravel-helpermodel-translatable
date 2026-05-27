@@ -1,6 +1,6 @@
 # Upgrading
 
-## Unreleased
+## 2.0
 
 ### Renamed `language` column to `locale`
 
