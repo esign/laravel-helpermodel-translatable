@@ -228,7 +228,7 @@ trait HelperModelTranslatable
                         ->on('fallback.' . $helperModelForeignKey, '=', 'base.' . $helperModelForeignKey)
                         ->on('fallback.locale', '=', 'base.fallback_locale');
                 })
-                ->whereColumn('base.' . $helperModelForeignKey, $this->qualifyColumn('id'))
+                ->whereColumn('base.' . $helperModelForeignKey, $this->getQualifiedKeyName())
                 ->where('base.locale', App::getLocale())
                 ->where(is_string($column) ? "fallback.$column" : $column, $operator, $value);
         });
