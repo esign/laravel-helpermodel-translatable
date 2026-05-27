@@ -26,6 +26,14 @@ Schema::table('post_translations', function (Blueprint $table) {
 
 The `getFallbackLocale()` method now reads from the translation model's `fallback_locale` column first. If not defined, it falls back to `config('app.fallback_locale')`.
 
+Example data:
+```json
+{"id": 1, "page_id": 1, "locale": "nl-be", "fallback_locale": null, "title": "Home"}
+{"id": 2, "page_id": 1, "locale": "nl-nl", "fallback_locale": "nl-be", "title": null}
+```
+
+The main locale does not define a `fallback_locale`. Only secondary locales that need to fall back to another locale should have this column set.
+
 ### New `whereFallbackTranslation` / `orWhereFallbackTranslation` scopes
 
 Two new query scopes are available for querying models via their database-defined fallback:

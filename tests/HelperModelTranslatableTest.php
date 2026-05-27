@@ -454,13 +454,9 @@ final class HelperModelTranslatableTest extends TestCase
     public function it_can_get_the_fallback_locale_from_the_translation_model(): void
     {
         $post = Post::create();
-        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'fallback_locale' => 'en']);
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl']);
         $this->createPostTranslation($post, 'en', ['title' => 'Post en', 'fallback_locale' => 'nl']);
 
-        App::setLocale('nl');
-        $this->assertEquals('en', $post->getFallbackLocale('nl'));
-
-        App::setLocale('en');
         $this->assertEquals('nl', $post->getFallbackLocale('en'));
     }
 
@@ -477,7 +473,7 @@ final class HelperModelTranslatableTest extends TestCase
     public function it_can_get_a_translation_using_database_defined_fallback(): void
     {
         $post = Post::create();
-        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'fallback_locale' => 'fr']);
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl']);
         $this->createPostTranslation($post, 'fr', ['title' => 'Post fr']);
         $this->createPostTranslation($post, 'de', ['title' => null, 'fallback_locale' => 'fr']);
 
@@ -491,7 +487,7 @@ final class HelperModelTranslatableTest extends TestCase
         $postA = Post::create();
         $postB = Post::create();
         $this->createPostTranslation($postA, 'en', ['title' => null, 'slug' => null, 'fallback_locale' => 'nl']);
-        $this->createPostTranslation($postA, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl', 'fallback_locale' => 'en']);
+        $this->createPostTranslation($postA, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl']);
         $this->createPostTranslation($postB, 'en', ['title' => 'Other post', 'slug' => 'other-post']);
 
         App::setLocale('en');
@@ -508,7 +504,7 @@ final class HelperModelTranslatableTest extends TestCase
         $postB = Post::create();
         $this->createPostTranslation($postA, 'en', ['title' => 'Post en']);
         $this->createPostTranslation($postB, 'en', ['title' => null, 'fallback_locale' => 'nl']);
-        $this->createPostTranslation($postB, 'nl', ['title' => 'Post nl', 'fallback_locale' => 'en']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post nl']);
 
         App::setLocale('en');
         $posts = Post::whereTranslation('title', '=', 'Post en', 'en')
@@ -524,7 +520,7 @@ final class HelperModelTranslatableTest extends TestCase
     {
         $post = Post::create();
         $this->createPostTranslation($post, 'en', ['title' => 'Post en', 'slug' => null, 'fallback_locale' => 'nl']);
-        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl', 'fallback_locale' => 'en']);
+        $this->createPostTranslation($post, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl']);
 
         App::setLocale('en');
         $this->get('/post-nl')->assertSee('Post en');
@@ -535,10 +531,10 @@ final class HelperModelTranslatableTest extends TestCase
     {
         $postA = Post::create();
         $postB = Post::create();
-        $this->createPostTranslation($postA, 'en', ['title' => 'Post en', 'slug' => 'post', 'fallback_locale' => 'nl']);
-        $this->createPostTranslation($postA, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl', 'fallback_locale' => 'en']);
+        $this->createPostTranslation($postA, 'en', ['title' => 'Post en', 'slug' => 'post']);
+        $this->createPostTranslation($postA, 'nl', ['title' => 'Post nl', 'slug' => 'post-nl']);
         $this->createPostTranslation($postB, 'en', ['title' => null, 'slug' => null, 'fallback_locale' => 'nl']);
-        $this->createPostTranslation($postB, 'nl', ['title' => 'Post B nl', 'slug' => 'post', 'fallback_locale' => 'en']);
+        $this->createPostTranslation($postB, 'nl', ['title' => 'Post B nl', 'slug' => 'post']);
 
         App::setLocale('en');
         $this->get('/post')->assertSee('Post en');
