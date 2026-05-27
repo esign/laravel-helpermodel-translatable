@@ -98,6 +98,7 @@ To retrieve the actual translation model you may use the `getTranslationModel` m
 ```php
 $post->getTranslationModel();
 $post->getTranslationModel('nl');
+$post->getTranslationModel('nl', true); // falls back to the fallback locale if no model exists
 ```
 
 In case you do not supply a locale, the current locale will be used.

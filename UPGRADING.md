@@ -44,6 +44,15 @@ Post::whereTranslation('title', '=', $value, App::getLocale())
     ->orWhereFallbackTranslation('title', '=', $value);
 ```
 
+### `getTranslationModel` now supports fallback
+
+The `getTranslationModel` method now accepts a second `useFallbackLocale` parameter, consistent with `getTranslation`:
+
+```php
+$post->getTranslationModel('nl');        // returns null if no model exists
+$post->getTranslationModel('nl', true);  // falls back to the fallback locale's model
+```
+
 ### Route model binding with fallback support
 
 The `resolveRouteBinding` method now automatically resolves models via the fallback translation when no match is found for the current locale. This requires the `fallback_locale` column to be present on your translation tables.
